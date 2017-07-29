@@ -6,23 +6,22 @@ import java.util.Collection;
 import java.util.Date;
 
 public class Wall {
-	private User owner;
-	private Collection<Post> posts;
+	private User user;
+	private static Collection<Post> posts = new ArrayList<>();
 
 	public Wall() {
-		User user = new User();
+		user = new User();
 		user.setId(1);
 		user.setUsername("Alex");
-		posts = new ArrayList<>();
 		posts.add(new Post(1, "Testorz", Date.from(Instant.now())));
 	}
 
-	public User getOwner() {
-		return owner;
+	public User getUser() {
+		return user;
 	}
 
-	public void setOwner(User owner) {
-		this.owner = owner;
+	public void setUser(User owner) {
+		this.user = owner;
 	}
 
 	public Collection<Post> getPosts() {
@@ -31,5 +30,10 @@ public class Wall {
 
 	public void setPosts(Collection<Post> posts) {
 		this.posts = posts;
+	}
+
+	@Override
+	public String toString() {
+		return user.toString() + posts.size();
 	}
 }

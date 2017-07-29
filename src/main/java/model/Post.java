@@ -3,9 +3,12 @@ package model;
 import java.util.Date;
 
 public class Post {
+	// Completed by us when posted
 	private long id;
-	private String text;
 	private Date datePosted;
+	private User poster;
+
+	private String text;
 
 	public Post(long id, String text, Date datePosted) {
 		this.id = id;
@@ -35,5 +38,13 @@ public class Post {
 
 	public void setDatePosted(Date datePosted) {
 		this.datePosted = datePosted;
+	}
+
+	public User getPoster() {
+		return poster;
+	}
+
+	public void setPoster(User poster) {
+		this.poster = poster;
 	}
 }
