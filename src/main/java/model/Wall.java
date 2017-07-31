@@ -1,27 +1,29 @@
 package model;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 
 public class Wall {
-	private User user;
-	private static Collection<Post> posts = new ArrayList<>();
+	private long userId;
+	private Collection<Post> posts = new ArrayList<>();
 
-	public Wall() {
-		user = new User();
-		user.setId(1);
-		user.setUsername("Alex");
-		posts.add(new Post(1, "Testorz", Date.from(Instant.now())));
+	public Wall(long userID) {
+		this.userId = userID;
 	}
 
-	public User getUser() {
-		return user;
+	public boolean addPost(Post post) {
+		if (post == null)
+			return false;
+
+		post.setUserId(userId);
+		return posts.add(post);
 	}
 
-	public void setUser(User owner) {
-		this.user = owner;
+	public boolean createAndAddPost(String text) {
+		if (text == null || text.isEmpty())
+			return false;
+
+		return addPost(new Post(userId, text, posts.size()));
 	}
 
 	public Collection<Post> getPosts() {
@@ -34,6 +36,14 @@ public class Wall {
 
 	@Override
 	public String toString() {
-		return user.toString() + posts.size();
+		return "Wall: " + posts.size();
+	}
+
+	public long getUserId() {
+		return userId;
+	}
+
+	public void setUserId(long userID) {
+		this.userId = userID;
 	}
 }

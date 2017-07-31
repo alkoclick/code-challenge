@@ -1,26 +1,28 @@
 package model;
 
+import java.time.Instant;
 import java.util.Date;
 
 public class Post {
 	// Completed by us when posted
-	private long id;
+	private String id;
 	private Date datePosted;
-	private User poster;
+	private long userId;
 
 	private String text;
 
-	public Post(long id, String text, Date datePosted) {
-		this.id = id;
+	public Post(long userId, String text, long id) {
+		this.userId = userId;
 		this.text = text;
-		this.datePosted = datePosted;
+		this.id = userId + "_" + id;
+		this.datePosted = Date.from(Instant.now());
 	}
 
-	public long getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
@@ -40,11 +42,11 @@ public class Post {
 		this.datePosted = datePosted;
 	}
 
-	public User getPoster() {
-		return poster;
+	public long getUserId() {
+		return userId;
 	}
 
-	public void setPoster(User poster) {
-		this.poster = poster;
+	public void setUserId(long userId) {
+		this.userId = userId;
 	}
 }
