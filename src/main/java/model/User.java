@@ -1,11 +1,16 @@
 package model;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.stream.Collectors;
+
 import util.MainMemory;
 
 public class User {
 	private final long id;
 	private String username;
 	private Wall wall;
+	private Collection<User> followers;
 
 	public User(String username) {
 		this(MainMemory.getAvailableId(), username);
@@ -15,7 +20,20 @@ public class User {
 		this.id = id;
 		this.username = username;
 		this.wall = new Wall(id);
+		followers = new HashSet<>();
 		MainMemory.addUser(this);
+	}
+
+	public boolean addFollower(User user) {
+		if (user == null || user == this)
+			return false;
+
+		return followers.add(user);
+	}
+
+	public Collection<Post> getTimeline() {
+		return followers.stream().flatMap(user -> user.getWall().getPosts().stream()).sorted()
+				.collect(Collectors.toList());
 	}
 
 	public long getId() {
@@ -28,6 +46,14 @@ public class User {
 
 	public void setUsername(String username) {
 		this.username = username;
+	}
+
+	public Wall getWall() {
+		return wall;
+	}
+
+	public Collection<User> getFollowers() {
+		return followers;
 	}
 
 	@Override
@@ -48,14 +74,6 @@ public class User {
 	@Override
 	public int hashCode() {
 		return Long.hashCode(id);
-	}
-
-	public Wall getWall() {
-		return wall;
-	}
-
-	public void setWall(Wall wall) {
-		this.wall = wall;
 	}
 
 }

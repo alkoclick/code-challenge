@@ -12,13 +12,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import model.Wall;
 import util.MainMemory;
+import util.Messages;
 
 @RestController
 public class WallController {
 
-	private static final int MAX_LENGTH = 140;
+	private static final int MAX_LENGTH = Messages.getInt("Post.MaxLength");
+	public static final String WALL_URI = "/wall";
 
-	@RequestMapping(method = RequestMethod.GET, value = { "/wall", "/wall/{idPath}" })
+	@RequestMapping(method = RequestMethod.GET, value = { WALL_URI, WALL_URI + "/{idPath}" })
 	public ResponseEntity<Wall> getWall(@RequestParam(value = "id", defaultValue = "-1") long idParam,
 			@PathVariable Long idPath) {
 		long id = idPath != -1 ? idPath : idParam;
@@ -31,8 +33,8 @@ public class WallController {
 
 	}
 
-	@RequestMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE, method = RequestMethod.POST, value = { "/wall",
-			"/wall/{idPath}" })
+	@RequestMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE, method = RequestMethod.POST, value = { WALL_URI,
+			WALL_URI + "/{idPath}" })
 	ResponseEntity<?> postToWall(@RequestParam(value = "id", defaultValue = "-1") long idParam,
 			@PathVariable Long idPath, @RequestBody(required = false) String body) {
 		long id = idPath != -1 ? idPath : idParam;
@@ -48,8 +50,6 @@ public class WallController {
 			response = new ResponseEntity<>(HttpStatus.PAYLOAD_TOO_LARGE);
 		else
 			response = ResponseEntity.ok(MainMemory.getUsers().get(id).getWall().createAndAddPost(body));
-
-		System.out.println("Content type: " + response.getHeaders().getContentType());
 
 		return response;
 

@@ -3,7 +3,7 @@ package model;
 import java.time.Instant;
 import java.util.Date;
 
-public class Post {
+public class Post implements Comparable<Post> {
 	// Completed by us when posted
 	private String id;
 	private Date datePosted;
@@ -49,4 +49,10 @@ public class Post {
 	public void setUserId(long userId) {
 		this.userId = userId;
 	}
+
+	@Override
+	public int compareTo(Post other) {
+		return this.datePosted.compareTo(other.datePosted);
+	}
+
 }

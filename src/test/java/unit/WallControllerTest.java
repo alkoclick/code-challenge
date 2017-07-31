@@ -16,44 +16,38 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import app.Application;
 import control.WallController;
 import implem.TestBase;
-import okhttp3.OkHttpClient;
-import util.Messages;
 
 @RunWith(SpringRunner.class)
 @TestExecutionListeners
 public class WallControllerTest {
-	private static OkHttpClient client;
-	private static ObjectMapper mapper;
-	private static final String WALL_URL = Messages.getString("URI.Wall");
-	private static final String SERVER_URL = Messages.getString("URI.Localhost");
+	private static final String WALL_URL = WallController.WALL_URI;
 	private static final MediaType CONTENT_TYPE = Application.CONTENT_TYPE;
 	private MockMvc mockMvc;
 
 	@Before
 	public void setUp() {
-		client = new OkHttpClient();
-		mapper = new ObjectMapper();
-		TestBase.initializeData();
+		TestBase.createSampleUsers();
 		this.mockMvc = MockMvcBuilders.standaloneSetup(new WallController()).build();
 	}
 
 	@Test
-	public void testPostToWall() throws Exception {
+	public void postToWall() throws Exception {
 
 		// Normal, valid entry
 		this.mockMvc.perform(post(WALL_URL + "/" + 1).content("Testing upload").accept(CONTENT_TYPE))
 				.andExpect(content().contentType(CONTENT_TYPE)).andExpect(status().isOk());
 
+		// Empty string content
 		this.mockMvc.perform(post(WALL_URL + "/" + 1, "").contentType(CONTENT_TYPE).content("").accept(CONTENT_TYPE))
 				.andExpect(status().isNoContent());
 
+		// No content
 		this.mockMvc.perform(post(WALL_URL + "/" + 1).accept(CONTENT_TYPE)).andExpect(status().isNoContent());
 
+		// Oversized
 		this.mockMvc
 				.perform(post(WALL_URL + "/" + 1)
 						.content(
@@ -65,17 +59,8 @@ public class WallControllerTest {
 
 	@Test
 	public void getWall() throws Exception {
+		// Should be empty
 		this.mockMvc.perform(get(WALL_URL + "/" + 1).accept(CONTENT_TYPE)).andExpect(jsonPath("$.posts", hasSize(0)))
-				.andExpect(status().isOk());
-
-		// this.mockMvc.perform(get(WALL_URL + "/" +
-		// 2).accept(MediaType.APPLICATION_JSON_UTF8))
-		// .andExpect(jsonPath("$.user.username").value("Mateusz")).andExpect(jsonPath("$.posts",
-		// hasSize(1)));
-
-		// this.mockMvc.perform(get(WALL_URL + "/" +
-		// 3).accept(MediaType.APPLICATION_JSON_UTF8))
-		// .andExpect(jsonPath("$.user.username").value("Guilherme")).andExpect(jsonPath("$.posts",
-		// hasSize(1)));
+				.andExpect(content().contentType(CONTENT_TYPE)).andExpect(status().isOk());
 	}
 }
