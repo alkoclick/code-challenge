@@ -14,12 +14,12 @@ public class TimelineController {
 	public static final String TIMELINE_URL = "/timeline";
 
 	@RequestMapping(method = RequestMethod.GET, value = { TIMELINE_URL, TIMELINE_URL + "/{idPath}" })
-	public ResponseEntity<Object> wall(@RequestParam(value = "idParam", defaultValue = "-1") long idParam,
-			@PathVariable Long idPath) {
-		long id = idPath != -1 ? idPath : idParam;
-		if (id == -1)
+	public ResponseEntity<Object> wall(@RequestParam(value = "id", defaultValue = "-1") long idParam,
+			@PathVariable(required = false) Long idPath) {
+		long id = idPath != null && idPath > 0 ? idPath : idParam;
+		if (id < 1 || (idPath != null && idParam > 0))
 			return ResponseEntity.badRequest().build();
-		if (!MainMemory.getUsers().keySet().contains(id))
+		else if (!MainMemory.getUsers().keySet().contains(id))
 			return ResponseEntity.notFound().build();
 
 		return ResponseEntity.ok(MainMemory.getUsers().get(id).getTimeline());

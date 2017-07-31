@@ -1,6 +1,7 @@
 package unit;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.Before;
@@ -31,24 +32,53 @@ public class FollowControllerTest {
 		this.mockMvc.perform(post(FOLLOW_URL).param("idFollower", "1").param("idFollowee", "2").accept(CONTENT_TYPE))
 				.andExpect(status().isOk());
 
+		this.mockMvc.perform(post(FOLLOW_URL + "/" + 1).param("idFollowee", "2").accept(CONTENT_TYPE))
+				.andExpect(status().isOk());
+
 		// One with content
 		this.mockMvc.perform(post(FOLLOW_URL + "/" + 1 + "/" + 2).content("Mewtwo").accept(CONTENT_TYPE))
 				.andExpect(status().isOk());
 
+	}
+
+	@Test
+	public void postFollowsInvalid() throws Exception {
+		// Not enough params provided
+		this.mockMvc.perform(post(FOLLOW_URL).accept(CONTENT_TYPE)).andDo(print()).andExpect(status().isBadRequest());
+		this.mockMvc.perform(post(FOLLOW_URL + "/" + 1).accept(CONTENT_TYPE)).andDo(print())
+				.andExpect(status().isBadRequest());
+		this.mockMvc.perform(post(FOLLOW_URL).param("idFollower", "1").accept(CONTENT_TYPE))
+				.andExpect(status().isBadRequest());
+
+		// Both path and query params provided for follower/followee
+		this.mockMvc.perform(post(FOLLOW_URL + "/" + 1).param("idFollower", "1").accept(CONTENT_TYPE))
+				.andExpect(status().isBadRequest());
+		this.mockMvc.perform(post(FOLLOW_URL + "/" + 1 + "/" + 2).param("idFollower", "1").param("idFollowee", "2")
+				.accept(CONTENT_TYPE)).andExpect(status().isBadRequest());
+
 		// Invalid paths
-		this.mockMvc.perform(post(FOLLOW_URL + "/" + -1 + "/" + -1).accept(CONTENT_TYPE))
+		this.mockMvc.perform(post(FOLLOW_URL + "/" + -5 + "/" + -1).accept(CONTENT_TYPE))
 				.andExpect(status().isBadRequest());
-		this.mockMvc.perform(post(FOLLOW_URL + "/" + 1 + "/" + -1).accept(CONTENT_TYPE))
+		this.mockMvc.perform(post(FOLLOW_URL + "/" + 1 + "/" + -5).accept(CONTENT_TYPE))
 				.andExpect(status().isBadRequest());
-		this.mockMvc.perform(post(FOLLOW_URL + "/" + -1 + "/" + 1).content("Mewtwo").accept(CONTENT_TYPE))
+		this.mockMvc.perform(post(FOLLOW_URL + "/" + -5 + "/" + 1).accept(CONTENT_TYPE))
 				.andExpect(status().isBadRequest());
 
 		// Invalid params
 		this.mockMvc.perform(post(FOLLOW_URL).param("idFollower", "-1").param("idFollowee", "-2").accept(CONTENT_TYPE))
 				.andExpect(status().isBadRequest());
+		this.mockMvc.perform(post(FOLLOW_URL).param("idFollower", "1").param("idFollowee", "-2").accept(CONTENT_TYPE))
+				.andExpect(status().isBadRequest());
+		this.mockMvc.perform(post(FOLLOW_URL).param("idFollower", "-1").param("idFollowee", "2").accept(CONTENT_TYPE))
+				.andExpect(status().isBadRequest());
 
 		// Non-numerals
-
+		this.mockMvc
+				.perform(post(FOLLOW_URL).param("idFollower", "Mew").param("idFollowee", "Mewtwo").accept(CONTENT_TYPE))
+				.andExpect(status().isBadRequest());
+		this.mockMvc.perform(post(FOLLOW_URL + "/Mew/Mewtwo").accept(CONTENT_TYPE)).andExpect(status().isBadRequest());
+		this.mockMvc.perform(post(FOLLOW_URL + "/1/Mewtwo").accept(CONTENT_TYPE)).andExpect(status().isBadRequest());
+		this.mockMvc.perform(post(FOLLOW_URL + "/Mew/2").accept(CONTENT_TYPE)).andExpect(status().isBadRequest());
 	}
 
 }

@@ -14,7 +14,7 @@ apply plugin: 'org.springframework.boot'
 
 jar {
     baseName = '2eater'
-    version =  '0.1.1'
+    version =  '0.2.0'
 }
 
 repositories {
@@ -25,7 +25,6 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 dependencies {
-    compile 'com.squareup.okhttp3:okhttp:3.8.1'
     compile("org.springframework.boot:spring-boot-starter-web")
     testCompile('org.springframework.boot:spring-boot-starter-test')
 }

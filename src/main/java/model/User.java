@@ -8,31 +8,29 @@ import util.MainMemory;
 
 public class User {
 	private final long id;
-	private String username;
 	private Wall wall;
-	private Collection<User> followers;
+	private Collection<User> followed;
 
 	public User(String username) {
-		this(MainMemory.getAvailableId(), username);
+		this(MainMemory.getAvailableId());
 	}
 
-	public User(long id, String username) {
+	public User(long id) {
 		this.id = id;
-		this.username = username;
 		this.wall = new Wall(id);
-		followers = new HashSet<>();
+		followed = new HashSet<>();
 		MainMemory.addUser(this);
 	}
 
-	public boolean addFollower(User user) {
+	public boolean addFollowed(User user) {
 		if (user == null || user == this)
 			return false;
 
-		return followers.add(user);
+		return followed.add(user);
 	}
 
 	public Collection<Post> getTimeline() {
-		return followers.stream().flatMap(user -> user.getWall().getPosts().stream()).sorted()
+		return followed.stream().flatMap(user -> user.getWall().getPosts().stream()).sorted()
 				.collect(Collectors.toList());
 	}
 
@@ -40,25 +38,17 @@ public class User {
 		return id;
 	}
 
-	public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
 	public Wall getWall() {
 		return wall;
 	}
 
-	public Collection<User> getFollowers() {
-		return followers;
+	public Collection<User> getFollowed() {
+		return followed;
 	}
 
 	@Override
 	public String toString() {
-		return username + " - " + id;
+		return "User - " + id;
 	}
 
 	@Override

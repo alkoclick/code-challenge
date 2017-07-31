@@ -39,28 +39,74 @@ public class WallControllerTest {
 		// Normal, valid entry
 		this.mockMvc.perform(post(WALL_URL + "/" + 1).content("Testing upload").accept(CONTENT_TYPE))
 				.andExpect(content().contentType(CONTENT_TYPE)).andExpect(status().isOk());
+		this.mockMvc.perform(post(WALL_URL).param("id", "1").content("Testing upload").accept(CONTENT_TYPE))
+				.andExpect(content().contentType(CONTENT_TYPE)).andExpect(status().isOk());
 
 		// Empty string content
 		this.mockMvc.perform(post(WALL_URL + "/" + 1, "").contentType(CONTENT_TYPE).content("").accept(CONTENT_TYPE))
 				.andExpect(status().isNoContent());
+		this.mockMvc.perform(post(WALL_URL).param("id", "1").contentType(CONTENT_TYPE).content("").accept(CONTENT_TYPE))
+				.andExpect(status().isNoContent());
+	}
 
+	@Test
+	public void postToWallInvalid() throws Exception {
 		// No content
 		this.mockMvc.perform(post(WALL_URL + "/" + 1).accept(CONTENT_TYPE)).andExpect(status().isNoContent());
+		this.mockMvc.perform(post(WALL_URL).param("id", "1").accept(CONTENT_TYPE)).andExpect(status().isNoContent());
+
+		// Both id and param provided
+		this.mockMvc.perform(post(WALL_URL + "/" + 1).param("id", "1").accept(CONTENT_TYPE))
+				.andExpect(status().isBadRequest());
+
+		// Negative id provided
+		this.mockMvc.perform(post(WALL_URL + "/" + -5).accept(CONTENT_TYPE)).andExpect(status().isBadRequest());
+		this.mockMvc.perform(post(WALL_URL).param("id", "-5").accept(CONTENT_TYPE)).andExpect(status().isBadRequest());
+
+		// Nan id provided
+		this.mockMvc.perform(post(WALL_URL + "/Pichu").accept(CONTENT_TYPE)).andExpect(status().isBadRequest());
+		this.mockMvc.perform(post(WALL_URL).param("id", "Pikachu").accept(CONTENT_TYPE))
+				.andExpect(status().isBadRequest());
 
 		// Oversized
-		this.mockMvc
-				.perform(post(WALL_URL + "/" + 1)
-						.content(
-								"This is a text that will have more than 140 characters This is a text that will have more than 140 characters This is a text that will have more than 140 characters")
-						.accept(MediaType.APPLICATION_JSON_UTF8))
-				.andExpect(status().isPayloadTooLarge());
+		this.mockMvc.perform(post(WALL_URL + "/" + 1).content(TestBase.createOversizedText())
+				.accept(MediaType.APPLICATION_JSON_UTF8)).andExpect(status().isPayloadTooLarge());
+		this.mockMvc.perform(post(WALL_URL).param("id", "1").content(TestBase.createOversizedText())
+				.accept(MediaType.APPLICATION_JSON_UTF8)).andExpect(status().isPayloadTooLarge());
 
 	}
 
 	@Test
 	public void getWall() throws Exception {
-		// Should be empty
+		// Existing user without posts
 		this.mockMvc.perform(get(WALL_URL + "/" + 1).accept(CONTENT_TYPE)).andExpect(jsonPath("$.posts", hasSize(0)))
 				.andExpect(content().contentType(CONTENT_TYPE)).andExpect(status().isOk());
+		this.mockMvc.perform(get(WALL_URL).param("id", "1").accept(CONTENT_TYPE))
+				.andExpect(jsonPath("$.posts", hasSize(0))).andExpect(content().contentType(CONTENT_TYPE))
+				.andExpect(status().isOk());
+	}
+
+	@Test
+	public void getWallInvalid() throws Exception {
+		// Nonexistent user
+		this.mockMvc.perform(get(WALL_URL + "/" + 6171).accept(CONTENT_TYPE)).andExpect(status().isNotFound());
+		this.mockMvc.perform(get(WALL_URL).param("id", "6171").accept(CONTENT_TYPE)).andExpect(status().isNotFound());
+
+		// Param and path provided
+		this.mockMvc.perform(get(WALL_URL + "/" + 1).param("id", "1").accept(CONTENT_TYPE))
+				.andExpect(status().isBadRequest());
+
+		// Invalid id provided
+		this.mockMvc.perform(get(WALL_URL + "/" + 0).accept(CONTENT_TYPE)).andExpect(status().isBadRequest());
+		this.mockMvc.perform(get(WALL_URL).param("id", "0").accept(CONTENT_TYPE)).andExpect(status().isBadRequest());
+		this.mockMvc.perform(get(WALL_URL + "/" + -5).accept(CONTENT_TYPE)).andExpect(status().isBadRequest());
+		this.mockMvc.perform(get(WALL_URL + "/" + -5).accept(CONTENT_TYPE)).andExpect(status().isBadRequest());
+		this.mockMvc.perform(get(WALL_URL + "/12873612784512867451264").accept(CONTENT_TYPE))
+				.andExpect(status().isBadRequest());
+		this.mockMvc.perform(get(WALL_URL).param("id", "/12873612784512867451264").accept(CONTENT_TYPE))
+				.andExpect(status().isBadRequest());
+		this.mockMvc.perform(get(WALL_URL + "/Pikachu").accept(CONTENT_TYPE)).andExpect(status().isBadRequest());
+		this.mockMvc.perform(get(WALL_URL).param("id", "/Pikachu").accept(CONTENT_TYPE))
+				.andExpect(status().isBadRequest());
 	}
 }

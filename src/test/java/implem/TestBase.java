@@ -2,13 +2,15 @@ package implem;
 
 import model.User;
 import util.MainMemory;
+import util.Messages;
 
 public class TestBase {
+	private static final int MAX_LENGTH = Messages.getInt("Post.MaxLength");
 
 	public static void createSampleUsers() {
-		new User(1, "Alex");
-		new User(2, "Mateusz");
-		new User(3, "Guilherme");
+		new User(1);
+		new User(2);
+		new User(3);
 	}
 
 	public static void createSamplePosts() {
@@ -20,7 +22,15 @@ public class TestBase {
 		// This will include themselves, but addFollows should make sure that's
 		// not gonna happen
 		MainMemory.getUsers().values().forEach(user -> {
-			MainMemory.getUsers().values().forEach(user2 -> user.addFollower(user2));
+			MainMemory.getUsers().values().forEach(user2 -> user.addFollowed(user2));
 		});
+	}
+
+	public static String createOversizedText() {
+		String shouldBeOversized = "";
+		while (shouldBeOversized.length() < MAX_LENGTH) {
+			shouldBeOversized += "Pika pika";
+		}
+		return shouldBeOversized;
 	}
 }
