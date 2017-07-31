@@ -9,6 +9,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -16,6 +18,7 @@ import app.Application;
 import control.TimelineController;
 import implem.TestBase;
 
+@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 public class TimelineControllerTest {
 	private static final String TIMELINE_URL = TimelineController.TIMELINE_URL;
 	private static final MediaType CONTENT_TYPE = Application.CONTENT_TYPE;
